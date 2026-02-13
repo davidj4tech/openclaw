@@ -842,6 +842,23 @@ export async function textToSpeechTelephony(params: {
   return buildTtsFailureResult(errors);
 }
 
+function stripMarkdownForTts(input: string): string {
+  let text = input;
+  text = text.replace(/```[\s\S]*?```/g, (match) => match.replace(/```/g, ""));
+  text = text.replace(/`([^`]+)`/g, "$1");
+  text = text.replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1");
+  text = text.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1");
+  text = text.replace(/^\s{0,3}#{1,6}\s+/gm, "");
+  text = text.replace(/^\s{0,3}>\s?/gm, "");
+  text = text.replace(/^\s*[-*+]\s+/gm, "");
+  text = text.replace(/^\s*\d+\.\s+/gm, "");
+  text = text.replace(/(\*\*|__)(.*?)\1/g, "$2");
+  text = text.replace(/(\*|_)(.*?)\1/g, "$2");
+  text = text.replace(/~~(.*?)~~/g, "$1");
+  text = text.replace(/\|/g, " ");
+  return text;
+}
+
 export async function maybeApplyTtsToPayload(params: {
   payload: ReplyPayload;
   cfg: OpenClawConfig;
@@ -870,7 +887,10 @@ export async function maybeApplyTtsToPayload(params: {
   const cleanedText = directives.cleanedText;
   const trimmedCleaned = cleanedText.trim();
   const visibleText = trimmedCleaned.length > 0 ? trimmedCleaned : "";
-  const ttsText = directives.ttsText?.trim() || visibleText;
+  let ttsText = directives.ttsText?.trim() || visibleText;
+  if (config.stripMarkdown) {
+    ttsText = stripMarkdownForTts(ttsText);
+  }
 
   const nextPayload =
     visibleText === text.trim()

@@ -36,6 +36,8 @@ export type TtsConfig = {
   provider?: TtsProvider;
   /** Optional model override for TTS auto-summary (provider/model or alias). */
   summaryModel?: string;
+  /** Strip Markdown before TTS (basic cleanup). */
+  stripMarkdown?: boolean;
   /** Allow the model to override TTS parameters. */
   modelOverrides?: TtsModelOverrideConfig;
   /** ElevenLabs configuration. */

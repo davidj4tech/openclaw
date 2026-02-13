@@ -363,6 +363,7 @@ export const TtsConfigSchema = z
     mode: TtsModeSchema.optional(),
     provider: TtsProviderSchema.optional(),
     summaryModel: z.string().optional(),
+    stripMarkdown: z.boolean().optional(),
     modelOverrides: z
       .object({
         enabled: z.boolean().optional(),
