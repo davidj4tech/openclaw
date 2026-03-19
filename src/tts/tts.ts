@@ -179,6 +179,7 @@ export type TtsDirectiveOverrides = {
   openai?: {
     voice?: string;
     model?: string;
+    instructions?: string;
   };
   elevenlabs?: {
     voiceId?: string;
@@ -641,7 +642,6 @@ async function maybeForwardTtsAudio(params: {
   }
 }
 
-
 async function applyPostProcessSpeed(params: {
   audioPath: string;
   speed?: number;
@@ -815,6 +815,7 @@ export async function textToSpeech(params: {
       } else {
         const openaiModelOverride = params.overrides?.openai?.model;
         const openaiVoiceOverride = params.overrides?.openai?.voice;
+        const openaiInstructionsOverride = params.overrides?.openai?.instructions;
         audioBuffer = await openaiTTS({
           text: params.text,
           apiKey,
@@ -822,7 +823,7 @@ export async function textToSpeech(params: {
           model: openaiModelOverride ?? config.openai.model,
           voice: openaiVoiceOverride ?? config.openai.voice,
           speed: config.openai.speed,
-          instructions: config.openai.instructions,
+          instructions: openaiInstructionsOverride ?? config.openai.instructions,
           responseFormat: output.openai,
           timeoutMs: config.timeoutMs,
         });

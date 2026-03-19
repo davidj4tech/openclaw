@@ -135,6 +135,18 @@ export function parseTtsDirectives(
     return "";
   });
 
+  // Dedicated tag for multi-word instructions (e.g. "speak dramatically").
+  // Must be handled separately because the whitespace-splitting [[tts:key=value]]
+  // parser cannot handle multi-word values.
+  const instrTagRegex = /\[\[tts-instructions:([^\]]+)\]\]/gi;
+  cleanedText = cleanedText.replace(instrTagRegex, (_match, value: string) => {
+    hasDirective = true;
+    if (policy.allowVoice && value.trim()) {
+      overrides.openai = { ...overrides.openai, instructions: value.trim() };
+    }
+    return "";
+  });
+
   const directiveRegex = /\[\[tts:([^\]]+)\]\]/gi;
   cleanedText = cleanedText.replace(directiveRegex, (_match, body: string) => {
     hasDirective = true;
